@@ -26,6 +26,14 @@ function set_ansible_configuration() {
 # MAIN
 # ============================================================================
 
+# jerms
+set_ansible_configuration defaults "forks" "100"
+set_ansible_configuration defaults "gathering" "smart"
+set_ansible_configuration defaults "callback_whitelist" "profile_tasks"
+set_ansible_configuration ssh_connection "timeout" "10"
+set_ansible_configuration ssh_connection "retries" "5"
+
+
 # Enable re-use of SSH connections
 # http://docs.ansible.com/ansible/intro_configuration.html#pipelining
 set_ansible_configuration ssh_connection "pipelining" "True"
@@ -40,7 +48,8 @@ set_ansible_configuration ssh_connection "control_path" '%(directory)s/%%h-%%r'
 
 # Force re-gather facts for each new play (execution)
 # http://docs.ansible.com/ansible/intro_configuration.html#gathering
-set_ansible_configuration defaults "gathering" "implicit"
+#jerms commented this out
+# set_ansible_configuration defaults "gathering" "implicit"
 
 # Cache facts in JSON format in a tmp dir and save them 10 minutes
 # http://docs.ansible.com/ansible/playbooks_variables.html#fact-caching

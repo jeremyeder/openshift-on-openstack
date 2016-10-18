@@ -231,7 +231,7 @@ parameters:
     type: boolean
     description: >
       Automatically scale up/down openshift nodes.
-    default: false
+    default: False
 
   openshift_nodes_min:
     type: number
