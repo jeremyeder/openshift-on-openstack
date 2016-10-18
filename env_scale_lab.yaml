@@ -1,0 +1,83 @@
+parameters:
+   os_username: admin
+   os_password: password
+   os_auth_url: http://10.12.20.136:5000/v2.0
+   os_tenant_name: admin
+   os_region_name: RegionOne
+
+   deployment_type: openshift-enterprise
+   # set SSH access to VMs
+   ssh_user: cloud-user
+   ssh_key_name: id_rsa_perf
+   # Set the image type and size for the VMs
+   bastion_image: 2016-10-17-ocp-3.4.0.11-1-gold
+   bastion_flavor: m1.medium
+   master_image: 2016-10-17-ocp-3.4.0.11-1-gold
+   master_flavor: m1.medium
+   infra_image: 2016-10-17-ocp-3.4.0.11-1-gold
+   infra_flavor: m1.medium
+   node_image: 2016-10-17-ocp-3.4.0.11-1-gold
+   node_flavor: m1.medium
+   # Set an existing network for inbound and outbound traffic
+   external_network: public
+   dns_nameserver: 10.11.5.19,8.8.4.4,8.8.8.8
+   # Define the host name templates for master and nodes
+   domain_name: "example.com"
+   master_hostname: "openshift-master"
+   node_hostname: "openshift-node"
+   # Allocate additional space for Docker images
+   master_docker_volume_size_gb: 15
+   infra_docker_volume_size_gb: 15
+   node_docker_volume_size_gb: 10
+
+   # Specify the (initial) number of nodes to deploy
+   master_count: 3
+   infra_count: 2
+   node_count: 1
+
+#   master_count: 1
+#   infra_count: 1
+#   node_count: 1
+
+#   this allows HA testing on a single node.
+   master_server_group_policies: affinity
+   infra_server_group_policies: affinity
+
+# dont run yum update on nodes
+   system_update: False
+
+
+
+   # Add auxiliary services: OpenStack router and internal Docker registry
+   deploy_router: True
+   deploy_registry: True
+   # If using RHEL image, add RHN credentials for RPM installation on VMs
+   #rhn_username: "rhn-support-jeder"
+   #rhn_password: ""
+   #rhn_pool: '' # OPTIONAL
+   
+# jerms
+#   extra_repository_urls: http://10.12.20.141/scale_lab.repo
+   extra_repository_urls: http://10.12.20.141/scale_lab_no_rhel.repo
+   openshift_sdn: flannel
+
+   # Currently Ansible 2.1 is not supported so add these parameters as a workaround
+   openshift_ansible_git_url: https://github.com/openshift/openshift-ansible.git
+   openshift_ansible_git_rev: master
+
+resource_registry:
+  # use neutron LBaaS for master api and openshift router for apps
+  OOShift::LoadBalancer: loadbalancer_neutron.yaml
+  # use openshift SDN
+  OOShift::ContainerPort: sdn_openshift_sdn.yaml
+  # or use Flannel
+  OOShift::ContainerPort: sdn_flannel.yaml
+  # enable ipfailover for router setup
+  OOShift::IPFailover: ipfailover_keepalived.yaml
+  # create dedicated volume for docker storage
+  #OOShift::DockerVolume: volume_docker.yaml
+  #OOShift::DockerVolumeAttachment: volume_attachment_docker.yaml
+  OOShift::DockerVolume: volume_noop.yaml
+  OOShift::DockerVolumeAttachment: volume_attachment_noop.yaml
+  # use ephemeral cinder volume for openshift registry
+  OOShift::RegistryVolume: registry_ephemeral.yaml
