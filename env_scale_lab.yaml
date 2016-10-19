@@ -14,6 +14,8 @@ parameters:
    bastion_flavor: m1.medium
    master_image: 2016-10-17-ocp-3.4.0.11-1-gold
    master_flavor: m1.medium
+   etcd_image: 2016-10-17-ocp-3.4.0.11-1-gold
+   etcd_flavor: m1.medium
    infra_image: 2016-10-17-ocp-3.4.0.11-1-gold
    infra_flavor: m1.medium
    node_image: 2016-10-17-ocp-3.4.0.11-1-gold
@@ -32,6 +34,7 @@ parameters:
 
    # Specify the (initial) number of nodes to deploy
    master_count: 3
+   etcd_count: 2
    infra_count: 2
    node_count: 1
 
@@ -42,11 +45,13 @@ parameters:
 #   this allows HA testing on a single node.
    master_server_group_policies: affinity
    infra_server_group_policies: affinity
+   etcd_server_group_policies: affinity
 
 # dont run yum update on nodes
    system_update: False
 
-
+# custom docker registry
+   extra_openshift_ansible_params: '{"openshift_docker_additional_registries":"brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888", "openshift_docker_insecure_registries": "brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888"}'
 
    # Add auxiliary services: OpenStack router and internal Docker registry
    deploy_router: True
@@ -62,7 +67,9 @@ parameters:
    openshift_sdn: flannel
 
    # Currently Ansible 2.1 is not supported so add these parameters as a workaround
-   openshift_ansible_git_url: https://github.com/openshift/openshift-ansible.git
+   #openshift_ansible_git_url: https://github.com/openshift/openshift-ansible.git
+   # test if etcd endpoint fix works
+   openshift_ansible_git_url: https://github.com/jprovaznik/openshift-ansible.git
    openshift_ansible_git_rev: master
 
 resource_registry:
